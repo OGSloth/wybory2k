@@ -1,0 +1,23 @@
+{% extends "wybory.html" %}
+{% block content %}
+    {% if areas %}
+        <hr>
+        <div class = "select2-container" id="areas_div">
+            <h2 style="margin-bottom: 5%; margin-top: 5%">LISTA GMIN DLA WOJEWÓDZCTWA: {{ county_name }}</h2>
+            <table class = "table table-sm">
+                <tr>
+                    {% for v in areas %}
+                            <td><a href = {% url 'subarea' county_name v.name %}>{{ v.name }}</a></td>
+                            {% if forloop.counter|divisibleby:4 %}</tr><tr>{% endif %}
+                    {% endfor %}
+            </table>
+        </div>
+    {% endif %}
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        function myFunction() {
+            let go_to = document.getElementById('areas_div');
+           goToByScroll(go_to.id);
+        }
+    </script>
+{% endblock %}

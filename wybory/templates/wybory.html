@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Wybory 2000</title>
+
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+        <script src="https://www.gstatic.com/charts/loader.js"></script>
+        <script>
+            function goToByScroll(id) {
+                id = id.replace("link", "");
+                $('html,body').animate({
+                    scrollTop: $("#" + id).offset().top
+                }, 'slow');
+            }
+        </script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        {% if votes %}
+            <script type="text/javascript">
+                google.charts.load('current', {'packages':['corechart']});
+                google.charts.setOnLoadCallback(drawChart);
+                function drawChart() {
+                    let data = new google.visualization.DataTable();
+                      data.addColumn('string', 'Nazwisko');
+                      data.addColumn('number', 'Glosy');
+                      data.addRows([
+                        ['GRABOWSKI Dariusz', {{ votes.GRABOWSKI }}],
+                        ['IKONOWICZ Piotr', {{ votes.IKONOWICZ }}],
+                        ['KALINOWSKI Jarosław', {{ votes.KALINOWSKI }}],
+                        ['KORWIN-MIKKE Janusz', {{ votes.KORWIN }}],
+                        ['KRZAKLEWSKI Marian', {{ votes.KRZAKLEWSKI }}],
+                        ['KWAŚNIEWSKI Aleksander', {{ votes.KWASNIEWSKI }}],
+                        ['LEPPER Andrzej', {{ votes.LEPPER }}],
+                        ['ŁOPUSZAŃSKI Jan', {{ votes.LOPUSZANSKI }}],
+                        ['OLECHOWSKI Andrzej', {{ votes.OLECHOWSKI }}],
+                        ['PAWŁOWSKI Bogdan', {{ votes.PAWLOWSKI }}],
+                        ['WAŁĘSA Lech', {{ votes.WALESA }}],
+                        ['WILECKI Tadeusz', {{ votes.WILECKI }}],
+                        ['NIWEWAŻNE Głosy', {{ votes.NIEWAZNE }}],
+                      ]);
+                let canvas = document.getElementById('chart_div');
+                let options = {
+                    'width':canvas.width,
+                    'height':canvas.height
+                };
+
+                // Instantiate and draw our chart, passing in some options.
+                let chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+                chart.draw(data, options);
+              }
+            </script>
+        {% endif %}
+        <style>
+            .column {
+                float: left;
+                width: 50%;
+            }
+
+            .row:after {
+                content: "";
+                display: table;
+                clear: both;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <img style="min-width: 100%; max-height: 50vh;" src="https://i.imgur.com/F3xJ7zQ.jpg" alt="Election Background"/>
+        </header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-bottom: 5%">
+            <a class="navbar-brand" href="#">WYBORY 2000</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href='{% url 'index' %}'>Wyniki Ogólne<span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Wyniki w województwach
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                             {% if counties %}
+                                 {% for c in counties %}
+                                     <a class="dropdown-item" href="{% url 'county' c %}">{{ c }}</a>
+                                 {% endfor %}
+                            {% endif %}
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="myFunction()">Wyniki w gminach</a>
+                    </li>
+                     <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Wyniki w okręgach
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                             {% if areas_ids %}
+                                 {% for a in areas_ids %}
+                                     <a class="dropdown-item" href="{% url 'areas' a.area %}">Okręg: {{ a.area }}</a>
+                                 {% endfor %}
+                            {% endif %}
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <main style="margin-left: 5%;">
+            {% if votes %}
+                <hr></hr>
+                <div class="select2-container" style="margin-bottom: 10%;">
+                    <h2>
+                        Procentowa liczba głosów dla poszczególnych kandydatów
+                        {% if county_name %}
+                            na terenie województwa: {{ county_name }}
+                            {% if subarea_name %}
+                                , w gminie: {{ subarea_name }}
+                            {% endif %}
+                        {% endif %}
+                        {% if voting_place %}
+                            w {{ voting_place }}
+                        {% endif %}
+                        {% if area_id %}
+                            w okręgu: {{ area_id }}
+                        {% endif %}
+                    </h2>
+                    <div id="chart_div"></div>
+                </div>
+                <hr></hr>
+                <div id="chart_div" style="width:80%; height:60%"></div>
+                    <h2>
+                        Wyniki poszczególnych kandydatów
+                        {% if county_name %}
+                            na terenie województwa: {{ county_name }}
+                        {% endif %}
+                        {% if area_id %}
+                            w okręgu: {{ area_id }}
+                        {% endif %}
+                    </h2>
+                    <table class="table table-striped">
+                        <tr class="thead-dark">
+                            <th>Kandydat</th>
+                            <th>Liczba głosów oddanych na kandydata</th>
+                            <th>Liczba wszystkich ważnych głosów</th>
+                            <th>Procentowa liczba głosów oddanych na kandydata</th>
+                        </tr>
+                        {% for value, key in percent.items %}
+                            <tr>
+                                <td>{{value}}</td>
+                                <td>{{key.0}}</td>
+                                <td>{{suma}}</td>
+                                <td>{{ key.1 }}%</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            {% endif %}
+            {% block content %}
+            {% endblock %}
+        </main>
+        <aside></aside>
+        <hr></hr>
+        <footer class="page-footer font-small blue pt-4" style = "margin-left: 1%; margin-top:5%;">
+            <div class="row">
+                <div class="column container-fluid" style="background-color:greenyellow;">
+                    <h2>Wybory prezydenckie w 2000 roku</h2>
+                    <p>Wybory prezydenckie w Polsce w 2000 odbyły się 8 października. </p>
+                    <p>O urząd prezydenta ubiegało się początkowo 13 kandydatów, jednak Jan Olszewski wycofał
+                        swą kandydaturę przed wyborami na rzecz Mariana Krzaklewskiego.</p>
+                </div>
+                <div class="column container-fluid" style="background-color:dodgerblue;">
+                    <h2>Informacja</h2>
+                    <p>Strona powstała na potrzeby wykonania zadania zaliczeniowego na wydziale MIM Uniwersytetu Warszawskiego</p>
+                    <p>Wykonana przez Marcina Gadomskiego</p>
+                </div>
+            </div>
+        </footer>
+    </body>
+</html>
