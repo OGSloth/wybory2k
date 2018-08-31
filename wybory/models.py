@@ -36,8 +36,58 @@ class MainCommune(models.Model):
         db_table = 'main_commune'
 
 
-#class countries:
+class Countries(models.Model):
+    id = models.IntegerField(primary_key=True)
+    county = models.CharField(max_length=30, blank=True, null=True)
+    subareas = models.IntegerField(blank=True, null=True)
+    uprawnieni = models.IntegerField(blank=True, null=True)
+    people = models.IntegerField(blank=True, null=True)
+    sent = models.IntegerField(blank=True, null=True)
+    invalid = models.IntegerField(blank=True, null=True)
+    valid = models.IntegerField(blank=True, null=True)
+    grabowski = models.IntegerField(blank=True, null=True)
+    ikonowicz = models.IntegerField(blank=True, null=True)
+    kalinowski = models.IntegerField(blank=True, null=True)
+    korwin = models.IntegerField(blank=True, null=True)
+    krzaklewski = models.IntegerField(blank=True, null=True)
+    kwasniewski = models.IntegerField(blank=True, null=True)
+    lepper = models.IntegerField(blank=True, null=True)
+    lopuszanski = models.IntegerField(blank=True, null=True)
+    olechowski = models.IntegerField(blank=True, null=True)
+    pawlowski = models.IntegerField(blank=True, null=True)
+    walesa = models.IntegerField(blank=True, null=True)
+    wilecki = models.IntegerField(blank=True, null=True)
 
+    class Meta:
+        managed = False
+        db_table = 'countries'
+
+
+class MetaCountries(models.Model):
+
+    @staticmethod
+    def get_votes(country_name):
+        votes = Countries.objects.filter(county=country_name).aggregate(
+            GRABOWSKI=Sum('grabowski'),
+            IKONOWICZ=Sum('ikonowicz'),
+            KORWIN=Sum('korwin'),
+            KALINOWSKI=Sum('kalinowski'),
+            KRZAKLEWSKI=Sum('krzaklewski'),
+            KWASNIEWSKI=Sum('kwasniewski'),
+            LEPPER=Sum('lepper'),
+            LOPUSZANSKI=Sum('lopuszanski'),
+            OLECHOWSKI=Sum('olechowski'),
+            PAWLOWSKI=Sum('pawlowski'),
+            WALESA=Sum('walesa'),
+            WILECKI=Sum('wilecki'),
+            NIEWAZNE=Sum('invalid'),
+        )
+        return votes
+
+    @staticmethod
+    def get_countries():
+        countries = Countries.objects.values_list('county').distinct()
+        return countries.values('county').order_by('county')
 
 
 class MetaCommune(models.Model):
